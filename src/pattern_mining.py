@@ -1,7 +1,4 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report
 from mlxtend.frequent_patterns import apriori, fpgrowth, association_rules
 
 def find_frequent_itemsets_apriori(transactions, min_support=0.1):
@@ -29,10 +26,17 @@ def find_frequent_itemsets_fpgrowth(transactions, min_support=0.1):
     return frequent_itemsets
 
 def generate_association_rules(frequent_itemsets, min_confidence=0.5):
+    if frequent_itemsets.empty:
+        print("No frequent itemsets found.")
+        return pd.DataFrame()
     rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=min_confidence)
     return rules
 
 def create_risk_model(df):
+    from sklearn.model_selection import train_test_split
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import classification_report
+
     df['high_risk'] = df['diagnosis'].apply(lambda x: 1 if x in ['Heart Disease', 'COPD'] else 0)
     X = df[['age', 'bmi']]
     y = df['high_risk']
@@ -48,7 +52,5 @@ def create_risk_model(df):
     return clf
 
 def predict_risk(clf, age, bmi):
-    import pandas as pd
     data = pd.DataFrame({'age': [age], 'bmi': [bmi]})
     return clf.predict(data)
-
