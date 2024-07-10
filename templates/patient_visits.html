@@ -1,0 +1,39 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Visits</title>
+</head>
+<body>
+    <h1>Patient Visits</h1>
+    <div>
+        <img src="{{ chart_url }}" alt="Patient Visits Chart">
+    </div>
+    <a href="/">Back to Patient List</a>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Visits</title>
+    <style>
+        .chart-container {
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <img src="{{ chart_url }}" alt="Patient Visits Chart">
+    </div>
+    <a href="/patients">Back to Patient List</a>
+</body>
+</html>

@@ -34,7 +34,8 @@
                     <td>{{ patient[5] }}</td>
                     <td>{{ patient[6] }}</td>
                     <td>{{ patient[7] }}</td>
-                    <td><a href="/patient/{{ patient[0] }}/visits">View Chart</a></td>
+                    <!-- <td><a href="/patient/{{ patient[0] }}/visits">View Chart</a></td> -->
+                    <td><a href="{{ url_for('get_patient_visits', patient_id=patient[0]) }}">View Visits</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
