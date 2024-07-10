@@ -12,13 +12,13 @@ def plot_support(frequent_itemsets, min_support=0.1, max_items=20):
     
     # Plot the support of the frequent itemsets
     plt.figure(figsize=(12, 6))
-    plt.bar(range(len(limited_itemsets)), limited_itemsets['support'], tick_label=limited_itemsets['itemsets'])
+    plt.bar(range(len(limited_itemsets)), limited_itemsets['support'], tick_label=[str(i) for i in limited_itemsets['itemsets']])
     plt.xticks(rotation=90)
     plt.xlabel('Itemsets')
     plt.ylabel('Support')
     plt.title('Support of Frequent Itemsets')
-    plt.show()
     plt.savefig('output/support_plot.png')
+    plt.show()
     plt.close()
 
 def plot_confidence(rules, min_confidence=0.5, max_rules=20):
@@ -33,11 +33,11 @@ def plot_confidence(rules, min_confidence=0.5, max_rules=20):
     
     # Plot the confidence of the association rules
     plt.figure(figsize=(12, 6))
-    plt.bar(range(len(limited_rules)), limited_rules['confidence'], tick_label=limited_rules.index)
+    plt.bar(range(len(limited_rules)), limited_rules['confidence'], tick_label=[f"{rule[0]} -> {rule[1]}" for rule in limited_rules[['antecedents', 'consequents']].values])
     plt.xticks(rotation=90)
     plt.xlabel('Rules')
     plt.ylabel('Confidence')
     plt.title('Confidence of Association Rules')
+    plt.savefig('output/confidence_plot.png')
     plt.show()
-    plt.savefig('output/confidence_plot.png')  # Save plot as a file
     plt.close()
