@@ -70,3 +70,4 @@ def load_data_from_db(db_path):
     conn.close()
 
     return patients_df, records_df
+
