@@ -1,0 +1,33 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis Result</title>
+</head>
+<body>
+    <h1>Analysis Result</h1>
+    <p><strong>Text:</strong> {{ text }}</p>
+    <p><strong>Analysis:</strong></p>
+    <ul>
+        {% for result in analysis %}
+            <li>{{ result.label }}: {{ result.score }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/">Go Back</a>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis Result</title>
+</head>
+<body>
+    <h1>Analysis Result</h1>
+    <p>Text: {{ text }}</p>
+    <p>Label: {{ analysis.label }}</p>
+    <p>Score: {{ analysis.score }}</p>
+    <a href="{{ url_for('home') }}">Go back</a>
+</body>
+</html>

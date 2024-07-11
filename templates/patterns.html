@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Periodic Patterns</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Periodic Patterns for Patient {{ patient_id }}</h1>
+    <div id="patterns">
+        {% for pattern in patterns %}
+            <div class="pattern">
+                <p>Pattern: {{ pattern['pattern'] }}</p>
+                <p>Frequency: {{ pattern['frequency'] }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
