@@ -10,7 +10,8 @@ from src.data_processing import generate_synthetic_data, store_data_to_db
 from dotenv import load_dotenv
 import os
 from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
-from pattern_mining import find_periodic_patterns
+from src.pattern_mining import find_periodic_patterns, find_patterns, find_periodic_patterns_apriori, find_periodic_patterns_fpgrowth
+# from flask_sqlalchemy import SQLAlchemy
 
 # load_dotenv()
 # HF_API_TOKEN = os.getenv('HF_API_TOKEN')
@@ -21,8 +22,23 @@ HUGGING_FACE_TOKEN = os.getenv("HUGGING_FACE_MODEL")
 
 app = Flask(__name__)
 
-tokenizer = AutoTokenizer.from_pretrained(HUGGING_FACE_MODEL, use_auth_token=HUGGING_FACE_TOKEN)
-model = AutoModelForSequenceClassification.from_pretrained(HUGGING_FACE_MODEL, use_auth_token=HUGGING_FACE_TOKEN)
+DATABASE = 'data/patients.db'
+
+def get_db_connection():
+    conn = sqlite3.connect('data/patients.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def fetch_patient_visits(patient_id):
+    # conn = get_db_connection()
+    conn = sqlite3.connect('data/patients.db')
+    cursor = conn.cursor()
+    visits = cursor.execute('SELECT visit_date FROM records WHERE patient_id = ?', (patient_id,)).fetchall()
+    conn.close()
+    return visits
+
+tokenizer = AutoTokenizer.from_pretrained(HUGGING_FACE_MODEL, token=HUGGING_FACE_TOKEN) # use_auth_token changed to token
+model = AutoModelForSequenceClassification.from_pretrained(HUGGING_FACE_MODEL, token=HUGGING_FACE_TOKEN) # use_auth_token changed to token
 classifier = pipeline('text-classification', model=model, tokenizer=tokenizer)
 
 def analyze_text(text):
@@ -58,8 +74,8 @@ def home():
 @app.route('/generate-data', methods=['POST'])
 def generate_data():
     data = request.get_json()
-    num_patients = int(data.get('num_patients', 30))
-    num_records = int(data.get('num_records', 500))
+    num_patients = int(data.get('num_patients', 500))
+    num_records = int(data.get('num_records', 3000))
 
     patients_df, records_df = generate_synthetic_data(num_patients, num_records)
     store_data_to_db(patients_df, records_df, 'data/patients.db')
@@ -84,8 +100,7 @@ def get_records():
     conn.close()
     return jsonify(records)
 
-# @app.route('/patient/<string:patient_id>/visits', methods=['GET'])
-@app.route('/patient/<string:patient_id>/visits', methods=['GET'])
+@app.route('/patients/<string:patient_id>/visits', methods=['GET'])
 def get_patient_visits(patient_id):
     conn = sqlite3.connect('data/patients.db')
     cursor = conn.cursor()
@@ -133,7 +148,7 @@ def clear_data():
     return jsonify({'message': 'Data cleared from the database.'}), 200
 
 HUGGING_FACE_API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
-HUGGING_FACE_API_KEY = "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"
+HUGGING_FACE_API_KEY = "<HF API key place holder>"
 
 headers = {
     "Authorization": f"Bearer {HUGGING_FACE_API_KEY}"
@@ -149,18 +164,62 @@ def analyze():
     }
     return render_template('analysis_result.html', text=text, analysis=analysis)
 
-@app.route('/patient/<patient_id>/patterns')
+@app.route('/patterns', methods=['GET'])
+def patterns():
+    # Assuming you have a function `find_patterns` that does the pattern mining
+    patterns = find_patterns()
+    return jsonify(patterns)
+
+# @app.route('/patients/<patient_id>/patterns')
+# def patient_patterns(patient_id):
+#     visits = fetch_patient_visits(patient_id)
+#     visit_dates = [visit['visit_date'] for visit in visits]
+#     patterns = find_periodic_patterns(visit_dates)
+#     return render_template('patterns.html', patient_id=patient_id, patterns=patterns)
+
+# @app.route('/patients/<patient_id>/patterns')
+# def patient_patterns(patient_id):
+#     visits = fetch_patient_visits(patient_id)
+#     visit_dates = [visit[0] for visit in visits]  # Access tuple elements using integer indices
+#     patterns = find_periodic_patterns(visit_dates)
+#     return render_template('patterns.html', patient_id=patient_id, patterns=patterns)
+
+@app.route('/patients/<patient_id>/patterns')
 def patient_patterns(patient_id):
+    visits = fetch_patient_visits(patient_id)
+    visit_dates = [visit[0] for visit in visits]
+
+    apriori_patterns = find_periodic_patterns_apriori(visit_dates)
+    fpgrowth_patterns = find_periodic_patterns_fpgrowth(visit_dates)
+
+    return render_template('patterns.html', patient_id=patient_id, apriori_patterns=apriori_patterns, fpgrowth_patterns=fpgrowth_patterns)
+
+# @app.route('/patient/<patient_id>/patterns/apriori')
+# def patient_patterns_apriori(patient_id):
+#     visits = fetch_patient_visits(patient_id)
+#     visit_dates = [visit[0] for visit in visits]  # Accessing by index
+#     patterns = find_periodic_patterns_apriori(visit_dates)
+#     return render_template('patterns.html', patient_id=patient_id, patterns=patterns)
+
+@app.route('/patients/<patient_id>/patterns/apriori')
+def patient_patterns_apriori(patient_id):
     # Fetch patient visits from the database
-    visits = session.query(Visit).filter_by(patient_id=patient_id).all()
+    visits = fetch_patient_visits(patient_id)
 
     # Prepare the data in the format required by find_periodic_patterns
-    visit_dates = [visit.date for visit in visits]
+    visit_dates = [visit[0] for visit in visits]  # Accessing by index
 
-    # Process the visits to find periodic patterns
-    patterns = find_periodic_patterns(visit_dates)
+    # Process the visits to find periodic patterns using Apriori
+    apriori_patterns = find_periodic_patterns_apriori(visit_dates)
 
     # Render the template with the patterns
+    return render_template('patterns_apriori.html', patient_id=patient_id, apriori_patterns=apriori_patterns)
+
+@app.route('/patients/<patient_id>/patterns/fpgrowth')
+def patient_patterns_fpgrowth(patient_id):
+    visits = fetch_patient_visits(patient_id)
+    visit_dates = [visit[0] for visit in visits]  # Accessing by index
+    patterns = find_periodic_patterns_fpgrowth(visit_dates)
     return render_template('patterns.html', patient_id=patient_id, patterns=patterns)
 
 if __name__ == '__main__':

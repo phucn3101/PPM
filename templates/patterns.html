@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Periodic Patterns</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Periodic Patterns for Patient {{ patient_id }}</title>
 </head>
 <body>
     <h1>Periodic Patterns for Patient {{ patient_id }}</h1>
-    <div id="patterns">
-        {% for pattern in patterns %}
-            <div class="pattern">
-                <p>Pattern: {{ pattern['pattern'] }}</p>
-                <p>Frequency: {{ pattern['frequency'] }}</p>
-            </div>
+
+    <h2>Apriori Patterns</h2>
+    <ul>
+        {% for pattern in apriori_patterns %}
+            <li>{{ pattern['pattern'] }} - Frequency: {{ pattern['frequency'] }}</li>
         {% endfor %}
-    </div>
+    </ul>
+
+    <h2>FP-Growth Patterns</h2>
+    <ul>
+        {% for pattern in fpgrowth_patterns %}
+            <li>{{ pattern['pattern'] }} - Frequency: {{ pattern['frequency'] }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

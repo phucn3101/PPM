@@ -12,15 +12,15 @@
         <table class="table table-striped mt-3">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Age</th>
-                    <th>Gender</th>
-                    <th>Address</th>
-                    <th>Phone Number</th>
-                    <th>Email</th>
+                    <th>Mã bệnh nhân</th>
+                    <th>Họ và Tên</th>
+                    <th>Tuổi</th>
+                    <th>Giới tính</th>
+                    <th>Bệnh mắc phải</th>
+                    <!-- <th>Email</th>
                     <th>BMI</th>
-                    <th>Diagnosis</th>
-                    <th>Visit Chart</th>
+                    <th>Diagnosis</th> -->
+                    <th>Biểu đồ bệnh nhân</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,9 +31,9 @@
                     <td>{{ patient[2] }}</td>
                     <td>{{ patient[3] }}</td>
                     <td>{{ patient[4] }}</td>
-                    <td>{{ patient[5] }}</td>
+                    <!-- <td>{{ patient[5] }}</td>
                     <td>{{ patient[6] }}</td>
-                    <td>{{ patient[7] }}</td>
+                    <td>{{ patient[7] }}</td> -->
                     <!-- <td><a href="/patient/{{ patient[0] }}/visits">View Chart</a></td> -->
                     <td><a href="{{ url_for('get_patient_visits', patient_id=patient[0]) }}">View Visits</a></td>
                 </tr>

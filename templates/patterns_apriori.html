@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Periodic Patterns for Patient {{ patient_id }} - Apriori</title>
+</head>
+<body>
+    <h1>Periodic Patterns for Patient {{ patient_id }} - Apriori</h1>
+
+    <h2>Apriori Patterns</h2>
+    <ul>
+        {% for pattern in apriori_patterns %}
+            <li>{{ pattern['pattern'] }} - Frequency: {{ pattern['frequency'] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
